@@ -13,3 +13,5 @@ engine createEngine(int pwmPin,int in1, int in2);
 void forward(engine paramEngine);
 void reverse(engine paramEngine);
 void pause(engine paramEngine);
+void turnLeft(engine paramEngineA, engine paramEngineB);
+void turnRigth(engine paramEngineA, engine paramEngineB);

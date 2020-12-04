@@ -1,0 +1,2 @@
+void enableCompass();
+float getAcimut();

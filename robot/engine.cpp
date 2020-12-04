@@ -23,6 +23,44 @@ engine createEngine(int pwmPin,int in1, int in2){
     
 }
 
+//Turn left.
+void turnLeft(engine paramEngineA, engine paramEngineB){
+
+  //MOTOR A - Set pwm signal.
+  analogWrite(paramEngineA.enPin, turnSpeed);
+
+  //Set pin values.
+  digitalWrite(paramEngineA.in1, LOW);
+  digitalWrite(paramEngineA.in2, HIGH);
+
+  //MOTOR B - Set pwm signal.
+  analogWrite(paramEngineB.enPin, turnSpeed);
+
+  //Set pin values.
+  digitalWrite(paramEngineB.in1, HIGH);
+  digitalWrite(paramEngineB.in2, LOW);
+
+}
+
+//Turn rigth.
+void turnRigth(engine paramEngineA, engine paramEngineB){
+
+  //MOTOR A - Set pwm signal.
+  analogWrite(paramEngineA.enPin, turnSpeed);
+
+  //Set pin values.
+  digitalWrite(paramEngineA.in1, HIGH);
+  digitalWrite(paramEngineA.in2, LOW);
+
+  //MOTOR B - Set pwm signal.
+  analogWrite(paramEngineB.enPin, turnSpeed);
+
+  //Set pin values.
+  digitalWrite(paramEngineB.in1, LOW);
+  digitalWrite(paramEngineB.in2, HIGH);
+
+}
+
 //Move the motor forward.
 void forward(engine paramEngine){
 
