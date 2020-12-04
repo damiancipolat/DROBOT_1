@@ -19,6 +19,6 @@ int IN1=9;
 int IN2=8;
 
 //Motor B.
-int ENB=5;
 int IN4=7;
 int IN3=6;
+int ENB=5;

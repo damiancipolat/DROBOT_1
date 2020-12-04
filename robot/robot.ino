@@ -1,17 +1,22 @@
+#include "pins.h"
 #include "ligths.h"
+#include "engine.h"
 
-void setup() {  
-  Serial.begin(9600);  
-  
-  //Set leds.
-  setup_leds();
+//Set leds.
+led led_front=createLigth(LED_FRONT);
+led led_back=createLigth(LED_BACK);
+
+//Set engines.
+engine motorA=createEngine(ENA,IN1,IN2);
+engine motorB=createEngine(ENB,IN3,IN4);
+
+void setup(){
+  Serial.begin(9600);    
 }
 
 void loop() {
-  front_ligth(true);
-  back_ligth(false);    
-  delay(500);
-  front_ligth(false);
-  back_ligth(true);
-  delay(500);
+  turnOn(led_front);
+  turnOn(led_back);
+  forward(motorA);
+  forward(motorB);
 }

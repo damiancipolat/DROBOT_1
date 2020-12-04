@@ -1,19 +1,15 @@
 //Engine representation.
 struct engineType{
-  int enPin,
-  int in1,
-  int in2
+  int enPin;
+  int in1;
+  int in2;
 };
 
 //Data type.
-typedef struct robot_engine engineType;
-
-//Speeds.
-int forwardSpeed = 250;
-int turnSpeed = 170;
+typedef struct engineType engine;
 
 //Methods.
-robot_engine createEngine(int pwmPin,int in1, int in2);
-void forward(robot_engine paramEngine);
-void reverse(robot_engine paramEngine);
-void pause(robot_engine paramEngine);
+engine createEngine(int pwmPin,int in1, int in2);
+void forward(engine paramEngine);
+void reverse(engine paramEngine);
+void pause(engine paramEngine);

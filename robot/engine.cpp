@@ -1,20 +1,30 @@
 #include <Arduino.h>
 #include "engine.h"
 
-//Create an engine data type.
-robot_engine createEngine(int pwmPin,int in1, int in2){
+//Speeds.
+int forwardSpeed = 250;
+int turnSpeed = 170;
 
-  robot_engine  newEngine;
+//Create an engine data type.
+engine createEngine(int pwmPin,int in1, int in2){
+
+  //Define values.
+  engine newEngine;
   newEngine.enPin = pwmPin;
   newEngine.in1= in1;
   newEngine.in2= in2;
+
+  //Bind pins.
+  pinMode(pwmPin, OUTPUT);
+  pinMode(in1, OUTPUT);
+  pinMode(in2, OUTPUT);
 
   return newEngine;
     
 }
 
 //Move the motor forward.
-void forward(robot_engine paramEngine){
+void forward(engine paramEngine){
 
   //Set pwm signal.
   analogWrite(paramEngine.enPin, forwardSpeed);
@@ -26,7 +36,7 @@ void forward(robot_engine paramEngine){
 }
 
 //Move the motor in reverse.
-void reverse(robot_engine paramEngine){
+void reverse(engine paramEngine){
 
   //Set pwm signal.
   analogWrite(paramEngine.enPin, forwardSpeed);
@@ -38,7 +48,7 @@ void reverse(robot_engine paramEngine){
 }
 
 //Pause the robot.
-void pause(robot_engine paramEngine){
+void pause(engine paramEngine){
 
   //Set pwm signal.
   analogWrite(paramEngine.enPin, 0);
