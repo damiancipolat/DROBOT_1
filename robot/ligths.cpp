@@ -8,15 +8,15 @@ void setup_leds(){
 }
 
 void front_ligth(bool state){
-    if (state==true)
-      digitalWrite(LED_FRONT, HIGH);
-    else
-      digitalWrite(LED_FRONT, LOW);
+  if (state==true)
+    digitalWrite(LED_FRONT, HIGH);
+  else
+    digitalWrite(LED_FRONT, LOW);
 }
 
 void back_ligth(bool state){
-    if (state==true)
-      digitalWrite(LED_BACK, HIGH);
-    else
-      digitalWrite(LED_BACK, LOW);
+  if (state==true)
+    digitalWrite(LED_BACK, HIGH);
+  else
+    digitalWrite(LED_BACK, LOW);
 }
