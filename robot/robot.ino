@@ -65,33 +65,37 @@ void loop() {
     String cmd = bthBoard.serial.readString();
     Serial.println("Received command:"+cmd);
 
+    if (cmd=="left"){
+      desired=desired-10;
+    }
+
+    if (cmd=="rigth"){
+      desired=desired+10;
+    }
+
     if (cmd=="lock"){
       active=false;
-      turnOn(led_front);
-      turnOff(led_back);
     }
 
     if (cmd=="unlock"){
-      active=true;      
-      turnOff(led_front);
-      turnOn(led_back);
+      active=true;
+      turnOn(led_front);
+      turnOff(led_back);
     }
 
   }
   
   //Drive.
   if (active==true){
-    drive_robot(led_front,led_back,motorA,motorB,desired,angulo,5);    
+    turnOn(led_front);
+    turnOff(led_back);
+    drive_robot(led_front,led_back,motorA,motorB,desired,angulo,5);
+  }else{
+    turnOff(led_front);
+    turnOn(led_back);    
+    pause(motorA);
+    pause(motorB);
   }
-  
-  
-  
-
-  //forward(motorA);
-  //forward(motorB);
-  
-  //Drive the robot.
-  //if (in_pause==false)
   
 
 }
