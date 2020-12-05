@@ -1,6 +1,8 @@
 //Leds.
-int LED_FRONT=3;
-int LED_BACK=4;
+int LED_FRONT=4;
+int LED_BACK=3;
+int LED_SIGNAL_LEFT=A0;
+int LED_SIGNAL_RIGTH=A1;
 
 //Magnetometer.
 int COMPASS=3;

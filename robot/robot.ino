@@ -7,6 +7,8 @@
 //Set leds.
 led led_front=createLigth(LED_FRONT);
 led led_back=createLigth(LED_BACK);
+led led_signal_left=createLigth(LED_SIGNAL_LEFT);
+led led_signal_rigth=createLigth(LED_SIGNAL_RIGTH);
 
 //Set engines.
 engine motorA=createEngine(ENA,IN1,IN2);
@@ -21,8 +23,8 @@ void drive_robot(led ledA,led ledB, engine motorA, engine motorB, float desired_
   if (abs(desired_heading-heading)<=desviation){
     forward(motorA);
     forward(motorB);
-    turnOff(ledA);
-    turnOff(ledB);
+    turnOn(led_signal_left);
+    turnOn(led_signal_rigth);    
   } else {
       
     int x = (desired_heading - 359);
@@ -30,12 +32,12 @@ void drive_robot(led ledA,led ledB, engine motorA, engine motorB, float desired_
     int z = (y - 360);
                      
     if ((z <= 180) && (z >= 0)){
+      turnOn(led_signal_left);
+      turnOff(led_signal_rigth);
       turnLeft(motorA,motorB);
-      turnOn(ledA);
-      turnOff(ledB);
     }else{
-      turnOff(ledA);
-      turnOn(ledB);      
+      turnOff(led_signal_left);
+      turnOn(led_signal_rigth);      
       turnRigth(motorA,motorB);
    }
  }
@@ -65,22 +67,12 @@ void loop() {
     String cmd = bthBoard.serial.readString();
     Serial.println("Received command:"+cmd);
 
-    if (cmd=="left"){
-      desired=desired-10;
-    }
-
-    if (cmd=="rigth"){
-      desired=desired+10;
-    }
-
     if (cmd=="lock"){
       active=false;
     }
 
     if (cmd=="unlock"){
       active=true;
-      turnOn(led_front);
-      turnOff(led_back);
     }
 
   }
@@ -96,6 +88,5 @@ void loop() {
     pause(motorA);
     pause(motorB);
   }
-  
 
 }
