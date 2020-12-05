@@ -3,7 +3,6 @@
 #include "engine.h"
 #include "compass.h"
 #include "bluetooth.h"
-#include "driver.h"
 
 //Set leds.
 led led_front=createLigth(LED_FRONT);
@@ -15,7 +14,6 @@ engine motorB=createEngine(ENB,IN3,IN4);
 
 //Set boards.
 bth bthBoard=createBoard(TX,RX);
-String DATO="0";
 
 //Drive a robot.
 void drive_robot(led ledA,led ledB, engine motorA, engine motorB, float desired_heading, float heading,int desviation){
@@ -50,18 +48,50 @@ void setup(){
   Serial.println("Listo!");
 }
 
+//States.
+float desired = 90;
+bool active=false;
+
 void loop() {
 
+  //Get the heading angle.
   float angulo = getAcimut();
-  Serial.println("°°°"+(String)angulo);
+  Serial.println("Acimut:"+(String)angulo+"°");
 
-  //Drive the robot.
-  drive_robot(led_front,led_back,motorA,motorB,90,angulo,90);
-  
-  /*
+  //Bluetooth controller.
   if (bthBoard.serial.available()){
-    DATO = bthBoard.serial.readString();
-    Serial.println(DATO);
-  }*/
-    
+
+    //Get the command from the board.
+    String cmd = bthBoard.serial.readString();
+    Serial.println("Received command:"+cmd);
+
+    if (cmd=="lock"){
+      active=false;
+      turnOn(led_front);
+      turnOff(led_back);
+    }
+
+    if (cmd=="unlock"){
+      active=true;      
+      turnOff(led_front);
+      turnOn(led_back);
+    }
+
+  }
+  
+  //Drive.
+  if (active==true){
+    drive_robot(led_front,led_back,motorA,motorB,desired,angulo,5);    
+  }
+  
+  
+  
+
+  //forward(motorA);
+  //forward(motorB);
+  
+  //Drive the robot.
+  //if (in_pause==false)
+  
+
 }

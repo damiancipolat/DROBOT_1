@@ -6,12 +6,12 @@ int LED_BACK=4;
 int COMPASS=3;
 
 //Bluetooth.
-int RX=10;
-int TX=11;
+int RX=11;
+int TX=12;
 
 //Ultrasonic ping.
-int ECO=4;
-int TRIGGER=5;
+int ECO=1;
+int TRIGGER=2;
 
 //Motor A.
 int ENA=10;
