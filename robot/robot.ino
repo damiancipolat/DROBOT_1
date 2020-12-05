@@ -23,8 +23,8 @@ void drive_robot(led ledA,led ledB, engine motorA, engine motorB, float desired_
   if (abs(desired_heading-heading)<=desviation){
     forward(motorA);
     forward(motorB);
-    turnOn(led_signal_left);
-    turnOn(led_signal_rigth);    
+    turnOff(led_signal_left);
+    turnOff(led_signal_rigth);    
   } else {
       
     int x = (desired_heading - 359);
@@ -52,7 +52,7 @@ void setup(){
 
 //States.
 float desired = 90;
-bool active=false;
+bool active=true;
 
 void loop() {
 
