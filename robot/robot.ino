@@ -50,6 +50,13 @@ void setup(){
   Serial.println("Listo!");
 }
 
+char* string2char(String command){
+    if(command.length()!=0){
+        char *p = const_cast<char*>(command.c_str());
+        return p;
+    }
+}
+
 //States.
 float desired = 90;
 bool active=true;
@@ -58,7 +65,7 @@ void loop() {
 
   //Get the heading angle.
   float angulo = getAcimut();
-  Serial.println("Acimut:"+(String)angulo+"°");
+  //Serial.println("Acimut:"+(String)angulo+"°");
 
   //Bluetooth controller.
   if (bthBoard.serial.available()){
@@ -67,12 +74,22 @@ void loop() {
     String cmd = bthBoard.serial.readString();
     Serial.println("Received command:"+cmd);
 
+    //Drive commands.
     if (cmd=="lock"){
       active=false;
     }
 
     if (cmd=="unlock"){
       active=true;
+    }
+
+    //Chat msgs.
+    if (cmd=="log"){
+      bthBoard.serial.write(string2char("Acimut:"+(String)angulo));
+    }
+
+    if (cmd=="hi"){
+      bthBoard.serial.write("Hi, from your robot!");
     }
 
   }
