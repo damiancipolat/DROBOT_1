@@ -17,8 +17,15 @@ engine motorB=createEngine(ENB,IN3,IN4);
 //Set boards.
 bth bthBoard=createBoard(TX,RX);
 
-//Drive a robot.
-void drive_robot(led ledA,led ledB, engine motorA, engine motorB, float desired_heading, float heading,int desviation){
+char* string2char(String command){
+    if(command.length()!=0){
+        char *p = const_cast<char*>(command.c_str());
+        return p;
+    }
+}
+
+//Drive a robot forward.
+void drive_robot_forward(led ledA,led ledB, engine motorA, engine motorB, float desired_heading, float heading,int desviation){
   
   if (abs(desired_heading-heading)<=desviation){
     forward(motorA);
@@ -43,18 +50,77 @@ void drive_robot(led ledA,led ledB, engine motorA, engine motorB, float desired_
  }
 }
 
+//Drive a robot turning left.
+void drive_robot_turn_left(led ledA,led ledB, engine motorA, engine motorB, float desired_heading, float heading,int desviation){
+
+  desired_heading = (desired_heading - 90);
+  if (desired_heading <= 0) {
+    desired_heading = (desired_heading + 360);
+  }
+
+  //Move the robot.
+  while ( abs(desired_heading - heading) >= desviation){
+    heading = getAcimut();
+        
+    if (desired_heading >= 360){
+      desired_heading = (desired_heading - 360);
+    }
+                                                                
+    int x = (desired_heading-359);
+    int y = (heading-x);
+    int z = y-360;
+    
+    if (z <= 180){
+      turnLeft(motorA,motorB);
+    } else {
+      turnRigth(motorA,motorB);
+    }
+  }
+
+  //Pause car.
+  pause(motorA);
+  pause(motorB);
+
+}
+
+//Drive a robot turning rigth.
+void drive_robot_turn_rigth(led ledA,led ledB, engine motorA, engine motorB, float desired_heading, float heading,int desviation){
+
+  desired_heading = (desired_heading + 90);
+  if (desired_heading >=360) {
+    desired_heading = (desired_heading - 360);
+  }
+
+  //Move the robot.
+  while ( abs(desired_heading - heading) >= desviation){
+    heading = getAcimut();
+        
+    if (desired_heading >= 360){
+      desired_heading = (desired_heading - 360);
+    }
+                                                                
+    int x = (desired_heading-359);
+    int y = (heading-x);
+    int z = y-360;
+
+    if ((z <= 180) && (z >= 0)){
+      turnLeft(motorA,motorB);
+    } else {
+      turnRigth(motorA,motorB);
+    }
+  }
+
+  //Pause car.
+  pause(motorA);
+  pause(motorB);
+
+}
+
 //Arduino events.
 void setup(){
   enableCompass();
   Serial.begin(9600);
   Serial.println("Listo!");
-}
-
-char* string2char(String command){
-    if(command.length()!=0){
-        char *p = const_cast<char*>(command.c_str());
-        return p;
-    }
 }
 
 //States.
@@ -65,7 +131,7 @@ void loop() {
 
   //Get the heading angle.
   float angulo = getAcimut();
-  //Serial.println("Acimut:"+(String)angulo+"°");
+  Serial.println("Acimut:"+(String)angulo+"°");
 
   //Bluetooth controller.
   if (bthBoard.serial.available()){
@@ -93,15 +159,17 @@ void loop() {
     }
 
   }
-  
+
   //Drive.
   if (active==true){
     turnOn(led_front);
     turnOff(led_back);
-    drive_robot(led_front,led_back,motorA,motorB,desired,angulo,5);
+    //drive_robot_forward(led_front,led_back,motorA,motorB,desired,angulo,5);
+    //drive_robot_turn_left(led_front,led_back,motorA,motorB,desired,angulo,5);
+    drive_robot_turn_rigth(led_front,led_back,motorA,motorB,desired,angulo,5);
   }else{
     turnOff(led_front);
-    turnOn(led_back);    
+    turnOn(led_back);
     pause(motorA);
     pause(motorB);
   }
