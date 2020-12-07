@@ -1,8 +1,13 @@
+#include <IRremote.h>
 #include "pins.h"
-#include "ligths.h"
 #include "engine.h"
+#include "ligths.h"
 #include "compass.h"
-#include "bluetooth.h"
+#include "keys.h"
+
+//Setup Ir sensor.
+IRrecv irrecv(IR);
+decode_results irCode;
 
 //Set leds.
 led led_front=createLigth(LED_FRONT);
@@ -14,24 +19,21 @@ led led_signal_rigth=createLigth(LED_SIGNAL_RIGTH);
 engine motorA=createEngine(ENA,IN1,IN2);
 engine motorB=createEngine(ENB,IN3,IN4);
 
-//Set boards.
-bth bthBoard=createBoard(TX,RX);
+//VARIABLES
+float desired = 90;
+float angulo=0;
+bool active=true;
 
-char* string2char(String command){
-    if(command.length()!=0){
-        char *p = const_cast<char*>(command.c_str());
-        return p;
-    }
-}
+//------------------------------------------------------------------
 
 //Drive a robot forward.
 void drive_robot_forward(led ledA,led ledB, engine motorA, engine motorB, float desired_heading, float heading,int desviation){
-  
+
   if (abs(desired_heading-heading)<=desviation){
     forward(motorA);
     forward(motorB);
-    turnOff(led_signal_left);
-    turnOff(led_signal_rigth);    
+    turnOff(ledA);
+    turnOff(ledB);    
   } else {
       
     int x = (desired_heading - 359);
@@ -39,139 +41,103 @@ void drive_robot_forward(led ledA,led ledB, engine motorA, engine motorB, float 
     int z = (y - 360);
                      
     if ((z <= 180) && (z >= 0)){
-      turnOn(led_signal_left);
-      turnOff(led_signal_rigth);
+      turnOn(ledA);
+      turnOff(ledB);
       turnLeft(motorA,motorB);
     }else{
-      turnOff(led_signal_left);
-      turnOn(led_signal_rigth);      
+      turnOff(ledA);
+      turnOn(ledB);      
       turnRigth(motorA,motorB);
    }
  }
 }
 
-//Drive a robot turning left.
-void drive_robot_turn_left(led ledA,led ledB, engine motorA, engine motorB, float desired_heading, float heading,int desviation){
-
-  desired_heading = (desired_heading - 90);
-  if (desired_heading <= 0) {
-    desired_heading = (desired_heading + 360);
-  }
-
-  //Move the robot.
-  while ( abs(desired_heading - heading) >= desviation){
-    heading = getAcimut();
-        
-    if (desired_heading >= 360){
-      desired_heading = (desired_heading - 360);
-    }
-                                                                
-    int x = (desired_heading-359);
-    int y = (heading-x);
-    int z = y-360;
-    
-    if (z <= 180){
-      turnLeft(motorA,motorB);
-    } else {
-      turnRigth(motorA,motorB);
-    }
-  }
-
-  //Pause car.
-  pause(motorA);
-  pause(motorB);
-
+int getIrData(){
+  if (irrecv.decode(&irCode)) {
+    int value = irCode.value;
+    irrecv.resume();
+    return value;
+  }  
 }
 
-//Drive a robot turning rigth.
-void drive_robot_turn_rigth(led ledA,led ledB, engine motorA, engine motorB, float desired_heading, float heading,int desviation){
-
-  desired_heading = (desired_heading + 90);
-  if (desired_heading >=360) {
-    desired_heading = (desired_heading - 360);
-  }
-
-  //Move the robot.
-  while ( abs(desired_heading - heading) >= desviation){
-    heading = getAcimut();
-        
-    if (desired_heading >= 360){
-      desired_heading = (desired_heading - 360);
+  
+//String converter.
+char* string2char(String command){
+    if(command.length()!=0){
+        char *p = const_cast<char*>(command.c_str());
+        return p;
     }
-                                                                
-    int x = (desired_heading-359);
-    int y = (heading-x);
-    int z = y-360;
-
-    if ((z <= 180) && (z >= 0)){
-      turnLeft(motorA,motorB);
-    } else {
-      turnRigth(motorA,motorB);
-    }
-  }
-
-  //Pause car.
-  pause(motorA);
-  pause(motorB);
-
 }
 
 //Arduino events.
-void setup(){
-  enableCompass();
+void setup(){    
   Serial.begin(9600);
   Serial.println("Listo!");
+  enableCompass();
+  irrecv.enableIRIn();
 }
 
-//States.
-float desired = 90;
-bool active=true;
+int old_command=0;
+int new_command=0;
+int command=0;
 
 void loop() {
-
+  
   //Get the heading angle.
-  float angulo = getAcimut();
-  Serial.println("Acimut:"+(String)angulo+"°");
+  angulo = getAcimut();
+  //Serial.println("Acimut:"+(String)angulo+"°");
 
-  //Bluetooth controller.
-  if (bthBoard.serial.available()){
+  //Get IR data.
+  int new_command = getIrData();
 
-    //Get the command from the board.
-    String cmd = bthBoard.serial.readString();
-    Serial.println("Received command:"+cmd);
+  if (old_command!=new_command){
+    command=new_command;
+    old_command=new_command;
+  }else{
+    command=0;
+  }
+  
+  if (command!=-1){
+    Serial.println("Command"+(String)command);
+  }    
 
-    //Drive commands.
-    if (cmd=="lock"){
-      active=false;
-    }
-
-    if (cmd=="unlock"){
-      active=true;
-    }
-
-    //Chat msgs.
-    if (cmd=="log"){
-      bthBoard.serial.write(string2char("Acimut:"+(String)angulo));
-    }
-
-    if (cmd=="hi"){
-      bthBoard.serial.write("Hi, from your robot!");
-    }
-
+  //Forward
+  if (command==UP){
+    forward(motorA);
+    forward(motorB);
   }
 
-  //Drive.
-  if (active==true){
-    turnOn(led_front);
-    turnOff(led_back);
-    //drive_robot_forward(led_front,led_back,motorA,motorB,desired,angulo,5);
-    //drive_robot_turn_left(led_front,led_back,motorA,motorB,desired,angulo,5);
-    drive_robot_turn_rigth(led_front,led_back,motorA,motorB,desired,angulo,5);
-  }else{
-    turnOff(led_front);
-    turnOn(led_back);
+  //Reverse
+  if (command==DOWN){
+    reverse(motorA);
+    reverse(motorB);
+  }
+
+  //Left
+  if (command==LEFT){
+    turnLeft(motorA,motorB);
+  }
+
+  //Rigth
+  if (command==RIGTH){
+    turnRigth(motorA,motorB);
+  }
+
+  //Stop
+  if (command==OK){
     pause(motorA);
     pause(motorB);
   }
 
+  //Serial.println();
+    //delay(1500);
+  //Drive.
+ // drive_robot_forward(led_front,led_back,motorA,motorB,desired,angulo,5);
+
+  //left 4335
+  //up 6375
+  //down 19125
+  //rigth 23205
+  //ok 14535
+ 
 }

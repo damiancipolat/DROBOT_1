@@ -1,8 +1,13 @@
+#include <Arduino.h>
+
 //Leds.
 int LED_FRONT=4;
 int LED_BACK=3;
 int LED_SIGNAL_LEFT=A0;
 int LED_SIGNAL_RIGTH=A1;
+
+//Sensor infrarojo.
+int IR=12;
 
 //Magnetometer.
 int COMPASS=3;
