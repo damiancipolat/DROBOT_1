@@ -88,23 +88,19 @@ void loop() {
   //Serial.println("Acimut:"+(String)angulo+"°");
 
   //Get IR data.
-  int new_command = getIrData();
-
-  if (old_command!=new_command){
-    command=new_command;
-    old_command=new_command;
-  }else{
-    command=0;
-  }
+  int command = getIrData();
   
   if (command!=-1){
     Serial.println("Command"+(String)command);
   }    
 
+
   //Forward
   if (command==UP){
     forward(motorA);
     forward(motorB);
+    desired=angulo;
+    drive_robot_forward(led_front,led_back,motorA,motorB,desired,angulo,5);    
   }
 
   //Reverse
@@ -128,6 +124,7 @@ void loop() {
     pause(motorA);
     pause(motorB);
   }
+  
 
   //Serial.println();
     //delay(1500);

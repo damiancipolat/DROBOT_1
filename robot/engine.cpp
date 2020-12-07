@@ -89,10 +89,10 @@ void reverse(engine paramEngine){
 void pause(engine paramEngine){
 
   //Set pwm signal.
-  analogWrite(paramEngine.enPin, 255);
+  analogWrite(paramEngine.enPin, 0);
 
   //Set pin values.
-  digitalWrite(paramEngine.in1, LOW);
-  digitalWrite(paramEngine.in2, LOW);
+  //digitalWrite(paramEngine.in1, LOW);
+  //digitalWrite(paramEngine.in2, LOW);
 
 }
