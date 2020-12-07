@@ -7,7 +7,7 @@
 #include "keys.h"
 
 //Screeen.
-LiquidCrystal_I2C lcd(0x27,A0,A1);
+LiquidCrystal_I2C lcd(0x27,12,6);
 
 //Setup Ir sensor.
 IRrecv irrecv(IR);
@@ -22,39 +22,6 @@ led led_signal_rigth=createLigth(LED_SIGNAL_RIGTH);
 //Set engines.
 engine motorA=createEngine(ENA,IN1,IN2);
 engine motorB=createEngine(ENB,IN3,IN4);
-
-//VARIABLES
-float desired = 90;
-float angulo=0;
-bool active=true;
-
-//------------------------------------------------------------------
-
-//Drive a robot forward.
-void drive_robot_forward(led ledA,led ledB, engine motorA, engine motorB, float desired_heading, float heading,int desviation){
-
-  if (abs(desired_heading-heading)<=desviation){
-    forward(motorA);
-    forward(motorB);
-    turnOff(ledA);
-    turnOff(ledB);    
-  } else {
-      
-    int x = (desired_heading - 359);
-    int y = (heading - (x));
-    int z = (y - 360);
-                     
-    if ((z <= 180) && (z >= 0)){
-      turnOn(ledA);
-      turnOff(ledB);
-      turnLeft(motorA,motorB);
-    }else{
-      turnOff(ledA);
-      turnOn(ledB);      
-      turnRigth(motorA,motorB);
-   }
- }
-}
 
 int getIrData(){
   if (irrecv.decode(&irCode)) {
@@ -73,6 +40,29 @@ char* string2char(String command){
     }
 }
 
+void clear_screen(int line){               
+  lcd.setCursor(0,line);
+  for(int n = 0; n < 20; n++)
+   lcd.print(" ");
+}
+
+int command=0;
+float desired = 180;
+float angulo=0;
+int diff=0;
+String label;
+
+void draw_screen(int angle, int diff,String label, int desired, int command){
+  //clear_screen(0);
+  //clear_screen(1);
+  lcd.display();
+  lcd.setCursor(0,0);
+  lcd.print("Acim:"+(String)angle+"  "+label+" S:"+(String)command); 
+  lcd.setCursor (0,1);
+  lcd.print("Diff:"+(String)diff+"  "+"D:"+(String)desired);
+  lcd.noDisplay();
+}
+
 //Arduino events.
 void setup(){    
   Serial.begin(9600);
@@ -84,22 +74,87 @@ void setup(){
   lcd.clear();  
 }
 
-int command=0;
+void turn_left_angle(int acimut, int desired){
+  diff = acimut-desired;
+  if ((acimut>=desired)&&(diff>=0)){
+    turnLeft(motorA,motorB);
+    label="X";
+  }else{
+    label="N";
+    pause(motorA);
+    pause(motorB);
+  }
+}
+
+void turn_rigth_angle(int acimut, int desired){
+  diff = desired-acimut;
+  if ((acimut<=desired)&&(diff>=0)){
+    turnRigth(motorA,motorB);
+    label="X";
+  }else{
+    label="N";
+    pause(motorA);
+    pause(motorB);
+  }
+}
+
+int state = 0;
 
 void loop() {
   
   //Get the heading angle.
   angulo = getAcimut();
-  Serial.println("Acimut:"+(String)angulo+"°");
-
+  //Serial.println("Acimut:"+(String)angulo+"°");  
+  
   //Get IR data.
-  //int command = getIrData();
- 
-  lcd.display();
-  lcd.setCursor(0,0);
-  lcd.print("Hola !!!!"); 
-  lcd.setCursor (0,1);
-  lcd.print("Angulo:"+(String)angulo);
+  int command = getIrData();
+  Serial.println("Key:"+(String)command+"State:"+(String)state);
+
+  if (command==LEFT){
+    state=1;
+    desired=45;
+  }
+  
+  if (command==RIGTH){
+    state=2;
+    desired=180;
+  }
+
+  if (command==UP){
+    state=3;
+  }  
+
+  if (command==DOWN){
+    state=4;
+  }  
+
+  if (command==OK){
+    state=5;
+  }    
+
+  if (state==1)
+    turn_left_angle(angulo,desired);
+
+  if (state==2)
+    turn_rigth_angle(angulo,desired);
+
+  if (state==3){
+    forward(motorA);  
+    forward(motorB);
+  }
+
+  if (state==4){
+    reverse(motorA);  
+    reverse(motorB);
+  } 
+    
+  if (state==5){
+    pause(motorA);  
+    pause(motorB);
+  }
+  
+  //Draw values.
+  draw_screen(angulo,diff,label,desired,state);
 
 /*
   //Forward
