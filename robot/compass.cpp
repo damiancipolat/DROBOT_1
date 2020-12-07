@@ -5,7 +5,7 @@
 MechaQMC5883 qmc;
 
 void enableCompass(){
-  Wire.begin();
+  Wire.begin(A1);
   qmc.init();
 }
 

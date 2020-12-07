@@ -1,9 +1,13 @@
+#include <LiquidCrystal_I2C.h>
 #include <IRremote.h>
 #include "pins.h"
 #include "engine.h"
 #include "ligths.h"
 #include "compass.h"
 #include "keys.h"
+
+//Screeen.
+LiquidCrystal_I2C lcd(0x27,A0,A1);
 
 //Setup Ir sensor.
 IRrecv irrecv(IR);
@@ -75,26 +79,29 @@ void setup(){
   Serial.println("Listo!");
   enableCompass();
   irrecv.enableIRIn();
+  lcd.init();
+  lcd.backlight();
+  lcd.clear();  
 }
 
-int old_command=0;
-int new_command=0;
 int command=0;
 
 void loop() {
   
   //Get the heading angle.
   angulo = getAcimut();
-  //Serial.println("Acimut:"+(String)angulo+"°");
+  Serial.println("Acimut:"+(String)angulo+"°");
 
   //Get IR data.
-  int command = getIrData();
-  
-  if (command!=-1){
-    Serial.println("Command"+(String)command);
-  }    
+  //int command = getIrData();
+ 
+  lcd.display();
+  lcd.setCursor(0,0);
+  lcd.print("Hola !!!!"); 
+  lcd.setCursor (0,1);
+  lcd.print("Angulo:"+(String)angulo);
 
-
+/*
   //Forward
   if (command==UP){
     forward(motorA);
@@ -123,7 +130,7 @@ void loop() {
   if (command==OK){
     pause(motorA);
     pause(motorB);
-  }
+  }*/
   
 
   //Serial.println();

@@ -7,7 +7,7 @@ int LED_SIGNAL_LEFT=A0;
 int LED_SIGNAL_RIGTH=A1;
 
 //Sensor infrarojo.
-int IR=12;
+int IR=2;
 
 //Magnetometer.
 int COMPASS=3;

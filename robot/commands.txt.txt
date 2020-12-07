@@ -1,3 +1,31 @@
+//------------------------------------------------------------------
+
+//Drive a robot forward.
+void drive_robot_forward(led ledA,led ledB, engine motorA, engine motorB, float desired_heading, float heading,int desviation){
+
+  if (abs(desired_heading-heading)<=desviation){
+    forward(motorA);
+    forward(motorB);
+    turnOff(ledA);
+    turnOff(ledB);    
+  } else {
+      
+    int x = (desired_heading - 359);
+    int y = (heading - (x));
+    int z = (y - 360);
+                     
+    if ((z <= 180) && (z >= 0)){
+      turnOn(ledA);
+      turnOff(ledB);
+      turnLeft(motorA,motorB);
+    }else{
+      turnOff(ledA);
+      turnOn(ledB);      
+      turnRigth(motorA,motorB);
+   }
+ }
+}
+
 //Drive a robot turning left.
 void drive_robot_turn_left(led ledA,led ledB, engine motorA, engine motorB, float desired_heading, float heading,int desviation, int minus_value){
 
